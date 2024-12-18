@@ -1,0 +1,4 @@
+github.com/eatmoreapple/openwechat v1.4.8 h1:p/9EoC+hY/wa+1FZijH25nqfYAlc1WBwN46wsSCmuTg=
+github.com/eatmoreapple/openwechat v1.4.8/go.mod h1:h4m2N8m0XsUKlm7UR8BUGkV89GNuKHCnlGV3J8n9Mpw=
+github.com/sashabaranov/go-openai v1.36.0 h1:fcSrn8uGuorzPWCBp8L0aCR95Zjb/Dd+ZSML0YZy9EI=
+github.com/sashabaranov/go-openai v1.36.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
