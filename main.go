@@ -6,15 +6,15 @@ import (
 	"github.com/eatmoreapple/openwechat"
 	openai "github.com/sashabaranov/go-openai"
 	"strings"
+	"time"
 )
 
 // TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
 // the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
-// sk-QcL0Hqjfpjh6D9stoYGRMRkzMAL0rpjgiuAskiFKK2Mi8wKf
 func main() {
 	bot := openwechat.DefaultBot(openwechat.Desktop) // 桌面模式
 	messages := make([]openai.ChatCompletionMessage, 0)
-	config := openai.DefaultConfig("sk-QcL0Hqjfpjh6D9stoYGRMRkzMAL0rpjgiuAskiFKK2Mi8wKf")
+	config := openai.DefaultConfig("your chatGPT api key here")
 	config.BaseURL = "https://api.chatanywhere.tech"
 	client := openai.NewClientWithConfig(config)
 	// 注册消息处理函数
@@ -26,6 +26,11 @@ func main() {
 		if msg.IsAt() {
 			// check msg.Content starts with "@akka "
 			if !strings.Contains(msg.Content, "@akka") {
+				return
+			}
+			now := time.Now().Hour()
+			if now <= 7 || now >= 20 {
+				msg.ReplyText(openwechat.Emoji.Shhh + "~ 晚安" + openwechat.Emoji.Sleep + openwechat.Emoji.Sleep)
 				return
 			}
 			// 截取 "@akka "后面的部分
@@ -42,7 +47,7 @@ func main() {
 				Role:    openai.ChatMessageRoleUser,
 				Content: question,
 			})
-
+			answer := ""
 			resp, err := client.CreateChatCompletion(
 				context.Background(),
 				openai.ChatCompletionRequest{
@@ -53,9 +58,27 @@ func main() {
 			if err != nil {
 				fmt.Printf("ChatCompletion error: %v\n", err)
 				messages = make([]openai.ChatCompletionMessage, 0)
-				return
+				messages = append(messages, openai.ChatCompletionMessage{
+					Role:    openai.ChatMessageRoleUser,
+					Content: question,
+				})
+				// 重试
+				res, err := client.CreateChatCompletion(
+					context.Background(),
+					openai.ChatCompletionRequest{
+						Model:    openai.GPT3Dot5Turbo,
+						Messages: messages,
+					},
+				)
+				if err != nil {
+					fmt.Printf("ChatCompletion error: %v\n", err)
+					return
+				} else {
+					answer = res.Choices[0].Message.Content
+				}
+			} else {
+				answer = resp.Choices[0].Message.Content
 			}
-			answer := resp.Choices[0].Message.Content
 			// 回答加入上下文
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    openai.ChatMessageRoleAssistant,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestChatGPT(t *testing.T) {
@@ -41,4 +42,12 @@ func TestChatGPT(t *testing.T) {
 	msg = strings.ReplaceAll(msg, "@akka", "")
 
 	fmt.Printf(msg)
+}
+
+func TestUtils(t *testing.T) {
+	// 获取当前时间 24小时制 小时
+	now := time.Now().Hour()
+	fmt.Println(now)
+
+	//fmt.Println(GetRandomString(10))
 }
