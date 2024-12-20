@@ -1,2 +1,5 @@
 .idea
 *.iml
+storage.json
+alias.txt
+**/config-local.yml
