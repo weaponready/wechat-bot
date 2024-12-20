@@ -10,8 +10,11 @@ import (
 	"wechat-bot/utils"
 )
 
-// TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
+type GroupMember struct {
+	Nickname string
+	Alias    string
+}
+
 func main() {
 	ApiConfig, err := utils.LoadConfig()
 	bot := openwechat.DefaultBot(openwechat.Desktop) // 桌面模式
@@ -52,7 +55,7 @@ func main() {
 
 	fmt.Println(groups, err)
 	// 人员名称映射
-	memberMap := make(map[string]string)
+	memberMap := make(map[string]GroupMember)
 	// 群组名称映射
 	groupMap := make(map[string]string)
 	// 群消息上下文
@@ -91,7 +94,7 @@ func main() {
 			sender, err := msg.SenderInGroup()
 			fromUserName := ""
 			if sender != nil {
-				fromUserName = memberMap[sender.UserName]
+				fromUserName = memberMap[sender.UserName].Alias
 			} else if msg.IsTickledMe() {
 				fromUserName = strings.ReplaceAll(msg.Content, "拍了拍我", "")
 				fromUserName = strings.ReplaceAll(fromUserName, "\"", "")
@@ -153,7 +156,7 @@ func main() {
 			})
 			groupMessageMap[groupId] = messages
 			if fromUserName != "" {
-				answer = "@" + fromUserName + " " + answer
+				answer = fmt.Sprintf("@%s %s", memberMap[sender.UserName].Nickname, answer)
 			}
 			// println answer
 			fmt.Println("GPT>> " + answer)
@@ -165,7 +168,7 @@ func main() {
 }
 
 func prepareCaches(groups []*openwechat.Group, defaultPrompts []openai.ChatCompletionMessage,
-	groupMap map[string]string, memberMap map[string]string, groupMessageMap map[string][]openai.ChatCompletionMessage) {
+	groupMap map[string]string, memberMap map[string]GroupMember, groupMessageMap map[string][]openai.ChatCompletionMessage) {
 	aliasMap, err := utils.ReadMapFromFile("alias.txt")
 	if err != nil {
 		fmt.Println(err)
@@ -189,9 +192,9 @@ func prepareCaches(groups []*openwechat.Group, defaultPrompts []openai.ChatCompl
 				}
 				alias := aliasMap[memberName]
 				if alias != "" {
-					memberMap[member.UserName] = alias
+					memberMap[member.UserName] = GroupMember{Nickname: memberName, Alias: alias}
 				} else {
-					memberMap[member.UserName] = memberName
+					memberMap[member.UserName] = GroupMember{Nickname: memberName, Alias: memberName}
 				}
 				fmt.Println(memberMap[member.UserName])
 			}
