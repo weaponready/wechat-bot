@@ -75,7 +75,7 @@ func main() {
 
 	// print member cache size
 	fmt.Println("member cache size:", len(memberMap))
-	const maxMessages = 20
+	const maxMessages = 50
 	// 注册消息处理函数
 	bot.MessageHandler = func(msg *openwechat.Message) {
 		if msg.IsText() {
@@ -156,7 +156,11 @@ func main() {
 			})
 			groupMessageMap[groupId] = messages
 			if fromUserName != "" {
-				answer = fmt.Sprintf("@%s %s", memberMap[sender.UserName].Nickname, answer)
+				if msg.IsTickledMe() {
+					answer = fmt.Sprintf("@%s %s", fromUserName, answer)
+				} else {
+					answer = fmt.Sprintf("@%s %s", memberMap[sender.UserName].Nickname, answer)
+				}
 			}
 			// println answer
 			fmt.Println("GPT>> " + answer)
