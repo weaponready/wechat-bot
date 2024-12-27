@@ -8,3 +8,6 @@
 DOC1: [openchat for go](https://github.com/eatmoreapple/openwechat)
 
 DOC2: [openai for go](https://github.com/sashabaranov/go-openai)
+
+### 多环境配置
+1. 配置环境变量
