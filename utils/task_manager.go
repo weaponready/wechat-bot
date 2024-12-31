@@ -34,7 +34,7 @@ func NewTaskManager() *TaskManager {
 }
 
 // AddTask adds a new task and schedules it
-func (tm *TaskManager) AddTask(msg *Message, delay time.Duration, callback func()) {
+func (tm *TaskManager) AddTask(msg *Message, delay time.Duration, callback func()) int {
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 
@@ -56,6 +56,7 @@ func (tm *TaskManager) AddTask(msg *Message, delay time.Duration, callback func(
 	}(task)
 
 	fmt.Printf("任务已添加: [ID: %d] %s (将在 %v 提醒)\n", taskID, task.Message, task.When)
+	return taskID
 }
 
 // triggerTask triggers a task and removes it from the list
@@ -89,4 +90,18 @@ func (tm *TaskManager) ListTasks() {
 	for id, task := range tm.tasks {
 		fmt.Printf("[ID: %d] %s (将在 %v 提醒)\n", id, task.Message, task.When)
 	}
+}
+
+// CancelTask cancels a task by its ID
+func (tm *TaskManager) CancelTask(taskID int) bool {
+	tm.mu.Lock()
+	defer tm.mu.Unlock()
+
+	if _, exists := tm.tasks[taskID]; exists {
+		delete(tm.tasks, taskID)
+		fmt.Printf("任务已取消: [ID: %d]\n", taskID)
+		return true
+	}
+	fmt.Printf("任务未找到: [ID: %d]\n", taskID)
+	return false
 }

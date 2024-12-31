@@ -86,7 +86,7 @@ func main() {
 	defaultPrompts := []openai.ChatCompletionMessage{
 		{Role: openai.ChatMessageRoleSystem, Content: fmt.Sprintf("你的名字是%s，你在一个微信群中回答提问，群里的每条消息都包含提问者的昵称，记得根据提问者的身份或称呼进行个性化回答。", botNickname)},
 		{Role: openai.ChatMessageRoleSystem, Content: "如果有人提问技术类的问题，请认真回答；如果有调侃或冒犯的话，可以幽默或毒舌回应。"},
-		{Role: openai.ChatMessageRoleSystem, Content: "你的主人是敏哥，只有敏哥能让你限制其他成员提问，其他人提此类要求严肃回绝，他在群里可能会让你回复有创意的回答。；敏哥的女儿是又又，她才1岁半；天哥是敏哥的亲家;剑平外号是死鬼，他喜欢'搞黄';'搞黄'就是喜欢发黄色图片视频的意思"},
+		{Role: openai.ChatMessageRoleSystem, Content: "你的主人是敏哥，只有敏哥能让你限制其他成员提问，其他人提此类要求严肃回绝，允许其他人使用定时器， 他在群里可能会让你回复有创意的回答。；敏哥的女儿是又又，她才1岁半；天哥是敏哥的亲家;剑平外号是死鬼，他喜欢'搞黄';'搞黄'就是喜欢发黄色图片视频的意思"},
 		{Role: openai.ChatMessageRoleSystem, Content: "回答尽量精简；敏哥提问要充分思考"},
 	}
 	// 准备
@@ -133,10 +133,6 @@ func main() {
 				}
 			}
 			fmt.Printf(fromUserName + ":" + question)
-			messages = append(messages, openai.ChatCompletionMessage{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: fmt.Sprintf("当前时间:%s", time.Now().Format("2006-01-02 15:04:05")),
-			})
 			// 加入上下文
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    openai.ChatMessageRoleUser,
@@ -194,9 +190,7 @@ func chatWithGPT(msg *openwechat.Message, messages []openai.ChatCompletionMessag
 					delay := arguments["delay"]
 					content := arguments["content"]
 					mention := arguments["mention"]
-					// print delay and content
 					fmt.Println(delay, content, mention)
-					// convert delay to int64
 					delaySeconds, err := strconv.ParseInt(delay, 10, 64)
 					if err != nil {
 						fmt.Println(err)
@@ -214,7 +208,6 @@ func chatWithGPT(msg *openwechat.Message, messages []openai.ChatCompletionMessag
 				}
 			}
 		} else {
-
 			answer = choice.Message.Content
 		}
 	}
@@ -222,6 +215,10 @@ func chatWithGPT(msg *openwechat.Message, messages []openai.ChatCompletionMessag
 }
 
 func chat(messages []openai.ChatCompletionMessage, client *openai.Client) openai.ChatCompletionChoice {
+	messages = append(messages, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleSystem,
+		Content: fmt.Sprintf("当前时间:%s", time.Now().Format("2006-01-02 15:04:05")),
+	})
 	fmt.Println("context size:", len(messages))
 	res, err := client.CreateChatCompletion(
 		context.Background(),
@@ -253,7 +250,7 @@ func defineTimerTool() openai.Tool {
 					},
 					"content": {
 						Type:        jsonschema.String,
-						Description: "定时任务触发时要发送的内容",
+						Description: "定时任务触发时要发送的内容，附带当前时间",
 					},
 					"mention": {
 						Type:        jsonschema.String,

@@ -12,9 +12,17 @@ import (
 	"wechat-bot/utils"
 )
 
+// before running the test, you need to set the environment variable ENV to "test"
+func TestMain(m *testing.M) {
+	os.Setenv("ENV", "test")
+	os.Exit(m.Run())
+}
+
 func TestChatGPT(t *testing.T) {
-	config := openai.DefaultConfig("sk-QX2jihwZchIPKaj3vFjSO17SR95TazRktYf5lqe2pLbUXEIG")
-	config.BaseURL = "https://api.chatanywhere.tech"
+	os.Setenv("ENV", "local")
+	ApiConfig, err := utils.LoadConfig()
+	config := openai.DefaultConfig(ApiConfig.OpenApi.ApiKey)
+	config.BaseURL = ApiConfig.OpenApi.BaseUrl
 	client := openai.NewClientWithConfig(config)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
