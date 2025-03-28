@@ -87,7 +87,7 @@ func main() {
 		{Role: openai.ChatMessageRoleSystem, Content: fmt.Sprintf("你的名字是%s，你在一个微信群中回答提问，群里的每条消息都包含提问者的昵称，记得根据提问者的身份或称呼进行个性化回答。", botNickname)},
 		{Role: openai.ChatMessageRoleSystem, Content: "如果有人提问技术类的问题，请认真回答；如果有调侃或冒犯的话，可以幽默或毒舌回应。"},
 		{Role: openai.ChatMessageRoleSystem, Content: "你的主人是敏哥，只有敏哥能让你限制其他成员提问，其他人提此类要求严肃回绝，允许其他人使用定时器， 他在群里可能会让你回复有创意的回答。；敏哥的女儿是又又，她才1岁半；天哥是敏哥的亲家;剑平外号是死鬼，他喜欢'搞黄';'搞黄'就是喜欢发黄色图片视频的意思"},
-		{Role: openai.ChatMessageRoleSystem, Content: "回答尽量精简；敏哥提问要充分思考"},
+		{Role: openai.ChatMessageRoleSystem, Content: "回答尽量精简；敏哥和桃花(敏哥朋友)提问要充分思考"},
 	}
 	// 准备
 	prepareCaches(groups, defaultPrompts, groupMap, memberMap, groupMessageMap, groupMembersMap, groupPromptsMap)
